@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-...your-sha512-here..." crossorigin="anonymous" />
+  <script src="angular.min.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="bootstrap.min.js"></script>
+  <style>
+  </style>
+</head>
+<body ng-app="EmployeeDashboard" ng-controller="myController">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Employee Dashboard</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" id="btnEmpty" ng-click="displayForAdd()"> <i class="fas fa-plus"></i>Add new Record</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <br />
+    <div class="row">
+      <div class="col-6">
+        <div class="row">
+          <div class="col-sm-4" ng-repeat="user in users">
+            <div class="card">
+              <img ng-src="{{ user.avatar }}" class="card-img-top" alt="Avatar" style="height: 200px; object-fit: cover;">
+              <div class="card-body">
+                <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
+                <p class="card-text">{{ user.email }}</p>
+                <div class="btn-group">
+                  <a href="#" data-toggle="modal" data-target="#myModal" ng-click="displayForUpdate(user)" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                  <a href="#" data-toggle="modal" data-target="#myModal" ng-click="displayForRemove(user)" class="btn btn-danger"><i class="fas fa-duotone fa-user-minus"></i> Remove</a>
+                  <a href="#" data-toggle="modal" data-target="#myModal" ng-click="displayForView(user)" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                </div>
+              </div>
+            </div>
+            <br>
+          </div>
+        </div>
+      </div>
+      <div class="col-5">
+        <textarea id="myTextarea" cols="90" rows="40"></textarea>
+      </div> 
+    </div> 
+  </div>
+  <div>
+  </div> 
+  <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="myModalLabel">{{ operation }}</h4>
+          <button type="button" class="close" data-dismiss="modal"> × </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="Name">ID</label>
+              <input type="text" class="form-control" ng-model="user.id" placeholder="ID" />
+            </div>
+            <div class="form-group">
+              <label for="Name">First Name</label>
+              <input type="text" class="form-control" ng-model="user.first_name" placeholder="First Name" ng-disabled="operation !== 'Update Record' && operation !== 'Add New Record'" />            
+            </div>
+            <div class="form-group">
+              <label for="Name">Last Name</label>
+              <input type="text" class="form-control" ng-model="user.last_name" placeholder="Last Name" ng-disabled="operation !== 'Update Record' && operation !== 'Add New Record'"/>
+            </div>
+            <div class="form-group">
+              <label for="Name">Email</label>
+              <input type="text" class="form-control" ng-model="user.email" placeholder="Email" ng-disabled="operation !== 'Update Record' && operation !== 'Add New Record'"/>
+            </div>
+            <div class="form-group">
+              <label for="Name">Avatar</label>
+              <input type="text" class="form-control" ng-model="user.avatar" placeholder="Avatar URL" ng-disabled="operation !== 'Update Record' && operation !== 'Add New Record'"/>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-target="#myModal" data-dismiss="modal" ng-click="addNewRecord()" id="btnAdd"> Add </button>
+          <button type="button" class="btn btn-danger" data-bind="#myModal" data-dismiss="modal" ng-click="deleteRecord()" id="btnDelete"> Delete </button>
+          <button type="button" class="btn btn-primary" data-bind="#myModal" data-dismiss="modal" ng-click="updateRecord()" id="btnUpdate"> Update </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"> Close </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    
+    var myApp = angular.module("EmployeeDashboard", []);
+    myApp.controller("myController", function ($scope, $http) {
+      function showPopup(title, message) {
+        alert(title + "\n\n" + message);
+      }
+      $scope.displayForAdd = function () {
+        $scope.operation = "Add New Record";
+        $scope.user = {
+          id: "",
+          first_name: "",
+          last_name: "",
+          email: "",
+          avatar: ""
+        };
+        $("#btnDelete").hide();
+        $("#btnUpdate").hide();
+        $("#btnAdd").show();
+      };
+      $scope.displayForView = function (user) {
+        $scope.operation = "View Record";
+        $scope.user = angular.copy(user);
+        $("#btnDelete").hide();
+        $("#btnAdd").hide();
+        $("#btnUpdate").hide();
+      };
+      $scope.displayForUpdate = function (user) {
+        $scope.operation = "Update Record";
+        $scope.user = angular.copy(user);
+        $("#btnDelete").hide();
+        $("#btnAdd").hide();
+        $("#btnUpdate").show();
+      };
+      $scope.displayForRemove = function (user) {
+        $scope.operation = "Remove Record";
+        $scope.user = angular.copy(user);
+        $("#btnUpdate").hide();
+        $("#btnAdd").hide();
+        $("#btnDelete").show();
+      };
+      $scope.addNewRecord = function () {
+  var user = angular.copy($scope.user);
+  $http({
+    method: "POST",
+    url: "http://localhost:62617/Api/Avatars/" + $scope.user.id,
+    data: user,
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  }).then(
+    function (response) {
+      console.log(response.data);
+      $scope.users.push(response.data.data); 
+      // Add the new record to the users array
+      var textareaJson = JSON.stringify($scope.users, undefined, 2);
+      $("#myTextarea").val(textareaJson); 
+      // Update the textarea value
+      $('#myModal').modal('hide'); // Hide the modal after adding the record
+    },
+    function (error) {
+      $scope.error = error.status;
+    }
+  );
+};
+      $scope.deleteRecord = function() {
+        $http({
+          method: "DELETE",
+          url: "http://localhost:62617/Api/Avatars/" + $scope.user.id,
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }).then(
+          function(response) {
+            console.log(response.data);
+            var index = $scope.users.findIndex(function(item) {
+              return item.id === $scope.user.id;
+            });
+            if (index !== -1) {
+              $scope.users.splice(index, 1); 
+              // Remove the deleted record from the users array
+              var textareaJson = JSON.stringify($scope.users, undefined, 2);
+              $("#myTextarea").val(textareaJson); 
+              // Update the textarea value
+            }
+          },
+          function(error) {
+            $scope.error = error.status;
+          }
+        );
+      };
+      $scope.updateRecord = function() {
+        var user = angular.copy($scope.user);
+        $http({
+          method: "PUT",
+          url: "http://localhost:62617/Api/Avatars/" + user.id,
+          data: user,
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }).then(
+          function(response) {
+            console.log(response.data);
+            var index = $scope.users.findIndex(function(item) {
+              return item.id === user.id;
+            });
+            if (index !== -1) {
+              $scope.users[index] = response.data; 
+              // Update the record in the users array
+              var textareaJson = JSON.stringify($scope.users, undefined, 2);
+              $("#myTextarea").val(textareaJson); 
+              // Update the textarea value
+            }
+          },
+          function(error) {
+            $scope.error = error.status;
+          }
+        );
+      };
+      $http({
+        method: "GET",
+        url: "http://localhost:62617/Api/Avatars/",
+      }).then(
+        function (response) {
+          console.log(response.data);
+          $scope.users = response.data;  
+        },
+        function (error) {
+          $scope.error = error.status;
+        }
+      );
+    });
+  </script>
+</body>
+</html>
